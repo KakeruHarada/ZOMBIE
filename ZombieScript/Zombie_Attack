@@ -1,0 +1,43 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UI;
+
+public class Zombie_Attack : MonoBehaviour
+{
+    public GameObject zombie;//ゾンビのベース
+    public GameObject hantei;// プレイヤーの当たり判定
+    public UnityStandardAssets.Characters.FirstPerson.RigidbodyFirstPersonController FPC;//プレイヤーのスクリプト
+
+    void Update()
+    {
+        //ゾンビのベースの位置と回転を取得
+        transform.position = zombie.transform.position;
+        transform.rotation = zombie.transform.rotation;
+
+        Invoke("HanteiMethod",1f);//当たり判定を出現させる処理
+
+        Invoke("EndMethod", 1.4f);//スクリプトが終了するまえに行う処理
+
+        //攻撃中、プレイヤーを操作無効にする処理
+        if (GameDirector.PlayerHP > 0)//プレイヤーのHPが0より上のとき
+        {
+            //プレイヤーのスクリプトを取得
+            FPC = FPC.GetComponent<UnityStandardAssets.Characters.FirstPerson.RigidbodyFirstPersonController>();
+            FPC.enabled = false;//プレイヤーのスクリプトを無効にする
+        }
+    }
+
+    void HanteiMethod()
+    {
+        hantei.SetActive(true);//当たり判定を出現させる
+    }
+    
+    void EndMethod()
+    {
+        FPC.enabled = true;//プレイヤーのスクリプトを有効にする
+        zombie.SetActive(true);//ゾンビのベースを出現させる
+        hantei.SetActive(false);//当たり判定を消す
+        gameObject.SetActive(false);//自分自身を消す
+    }
+}
