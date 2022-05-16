@@ -1,0 +1,49 @@
+  public GameObject target;//ターゲット
+    public GameObject gun;  　//銃
+    public GameObject bullet;//弾
+    public static int remain= 10;//装弾数（残り）
+    public static int possess = 5;//弾の所持弾数（最初は5）
+    int number = 0;//撃った回数
+    bool reload = true;//リロード中かどうか
+    
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.R)&&possess!=0)// 所持弾数が0じゃなくRを押したとき
+        {
+            reload = false;//リロード中にリロードできないようにする
+            Invoke("ReloadMethod", 1f);//リロード完了までに1秒遅らせる
+        }
+        if (Input.GetMouseButtonDown(0)&&reload==true)//リロードしてなく右クリックしたとき
+        {
+            if (remain != 0)//装弾数が0じゃない時
+            {
+                GetComponent<AudioSource>().Play();//発砲音
+                //弾のプレファブからインスタンスを作る
+                GameObject obj = Instantiate(bullet, gun.transform.position, Quaternion.identity);
+                //弾の発射方向を求める
+                Vector3 vec = (target.transform.position - gun.transform.position).normalized;
+                //弾を発射する
+                obj.GetComponent<Rigidbody>().velocity = vec * 150;
+                //１秒後に弾を消去する
+                Destroy(obj, 1);
+
+                remain -= 1;//装弾数を1減らす
+                number += 1;//撃った回数を1増やす
+            }
+        }
+    }
+    void ReloadMethod()//リロードの処理
+    {
+        if(possess>=number)//所持弾数が撃った回数以下の時
+        {
+            remain = 10;//装弾数を10に戻す
+            possess -= number;//所持弾数から撃った回数引く
+        }
+        else if (possess < number)//所持弾数が撃った回数より低い時
+        {
+            remain += possess;//所持弾数をすべて装填する
+            possess = 0;//所持弾数を0にする
+        }
+        number = 0;//撃った回数をリセット
+        reload = true;//リロード可能状態にする
+    }
